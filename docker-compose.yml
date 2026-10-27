@@ -1,0 +1,54 @@
+services:
+  postgresdb:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: museum_membership
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - springboot-postgres-net
+
+
+
+
+
+      
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: kamalasanthoshini/docker-backend-2400032355:latest
+    container_name: docker-springboot
+    ports:
+      - "2025:8081"
+    depends_on:
+      - postgresdb
+    restart: on-failure
+    networks:
+      - springboot-postgres-net
+
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      image: kamalasanthoshini/docker-frontend-2400032355:latest
+    container_name: docker-react
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: on-failure
+    networks:
+      - springboot-postgres-net
+
+
+volumes:
+  postgres_data:
+
+networks:
+  springboot-postgres-net:
